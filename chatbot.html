@@ -73,32 +73,14 @@
     <div class="container mx-auto p-4 flex flex-col h-full">
         <div class="flex items-center justify-between mb-4">
             <div class="flex items-center">
-                <svg
-					xmlns="http://www.w3.org/2000/svg"
-					viewBox="0 0 200 200"
-					class="w-16 h-16 mr-4"
-				>
-					<path
-						d="M30 100 L100 30 L170 100 L150 100 L150 170 H50 V100 L30 100 Z"
-						fill="#ffffff"
-					/>
-					<path
-						d="M70 90 Q100 80 130 90 L140 90 Q150 90 150 100 L150 130 Q150 140 140 140 L130 140 L115 155 L100 140 L60 140 Q50 140 50 130 L50 100 Q50 90 60 90 Z"
-						fill="#FFD700"
-					/>
-					<circle cx="85" cy="110" r="8" fill="#4A90E2" />
-					<circle cx="115" cy="110" r="8" fill="#4A90E2" />
-					<path
-						d="M85 130 Q100 140 115 130"
-						fill="none"
-						stroke="#4A90E2"
-						stroke-width="4"
-						stroke-linecap="round"
-					/>
-				</svg>
-                <h2 class="text-3xl font-bold text-white">
-					Beda Top Agent Assistant
-				</h2>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" class="w-16 h-16 mr-4">
+                    <path d="M30 100 L100 30 L170 100 L150 100 L150 170 H50 V100 L30 100 Z" fill="#ffffff"/>
+                    <path d="M70 90 Q100 80 130 90 L140 90 Q150 90 150 100 L150 130 Q150 140 140 140 L130 140 L115 155 L100 140 L60 140 Q50 140 50 130 L50 100 Q50 90 60 90 Z" fill="#FFD700"/>
+                    <circle cx="85" cy="110" r="8" fill="#4A90E2" />
+                    <circle cx="115" cy="110" r="8" fill="#4A90E2" />
+                    <path d="M85 130 Q100 140 115 130" fill="none" stroke="#4A90E2" stroke-width="4" stroke-linecap="round"/>
+                </svg>
+                <h2 class="text-3xl font-bold text-white">Beda Top Agent Assistant</h2>
             </div>
             <div id="agentInfo" class="hidden">
                 <span id="agentName" class="font-semibold mr-2"></span>
@@ -153,7 +135,7 @@
         chatInterface.classList.remove('hidden');
         agentInfo.classList.remove('hidden');
         agentName.textContent = `Agent: ${name}`;
-        addMessage('Assistant', 'Welcome to Beda Top Agent Assistant! How can I help you today?');
+        loadChatHistory();
     }
 
     function showLoginForm() {
@@ -213,6 +195,21 @@
         
         chatContainer.appendChild(messageDiv);
         chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    async function loadChatHistory() {
+        try {
+            const response = await fetch(`${API_URL}/messages`, {
+                headers: { 'Authorization': token }
+            });
+            const messages = await response.json();
+            chatContainer.innerHTML = '';
+            messages.forEach(msg => {
+                addMessage(msg.sender === 'agent' ? 'You' : 'Assistant', msg.content);
+            });
+        } catch (error) {
+            console.error('Error loading chat history:', error);
+        }
     }
 
     async function sendMessage() {
